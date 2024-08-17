@@ -35,7 +35,7 @@ class KNearestNeighbor(object):
         - num_loops: Determines which implementation to use to compute distances
           between training points and testing points.
 
-        Returns:
+        Returns:z                                                                                                                                                                                                                                                                                 
         - y: A numpy array of shape (num_test,) containing predicted labels for the
           test data, where y[i] is the predicted label for the test point X[i].
         """
@@ -77,7 +77,7 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                pass
+                dists[i,j] = np.sqrt(np.sum((X[i,:] - self.X_train[j,:]) ** 2))
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -101,7 +101,7 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            dists[i,:] = np.sqrt(np.sum((X[i,:] - self.X_train) ** 2, 1))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -130,8 +130,14 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        
+        X_square_sum = np.sum(X ** 2, axis=1)
+        X_train_square_sum = np.sum(self.X_train ** 2, axis=1)
+        X_mul_X_train = np.dot(X, self.X_train.T)
+        # [:, np.newaxis]是为了将测试样本特征的平方和扩展为形状为(n, 1)的列向量，
+        # 使其能借助广播机制与形状为(m,)的训练样本特征的平方和正确相加，得到一个形状为(n, m)的矩阵，
+        # 其中(i, j)的元素表示测试数据集中第 i 个样本与训练数据集中第 j 个样本之间的特征平方和之和
+        dists = np.sqrt(X_square_sum.T[:, np.newaxis] + X_train_square_sum - 2 * X_mul_X_train)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -164,7 +170,8 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            index_list = np.argsort(dists[i,:])
+            closest_y = self.y_train[index_list[:k]]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -176,7 +183,14 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            # 使用bincount()函数统计closest_y中每个元素（即每个邻居的标签）的出现次数
+            index_times = np.bincount(closest_y)
+
+            # 使用argmax()函数找到count数组中数值最大的元素的索引，也就是出现次数最多的标签对应的索引
+            most_frequent_index = np.argmax(index_times)
+
+            # 把出现次数最多的标签的索引赋给预测的y_pred
+            y_pred[i] = most_frequent_index
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
