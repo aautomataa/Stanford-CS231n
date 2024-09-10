@@ -1,4 +1,5 @@
-# CS231n
+# Stanford-CS231n
+
 ### 课程信息
 Course Homepage: [CS231n: Convolutional Neural Networks for Visual Recognition](https://cs231n.stanford.edu/)
 
