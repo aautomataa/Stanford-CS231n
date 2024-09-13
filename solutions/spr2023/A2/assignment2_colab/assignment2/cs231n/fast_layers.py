@@ -3,7 +3,7 @@ import numpy as np
 
 try:
     from .im2col_cython import col2im_cython, im2col_cython
-    from .im2col_cython import col2im_6d_cython
+    from .im2col_cython import col2im_6d_cython 
 except ImportError:
     print("""=========== You can safely ignore the message below if you are NOT working on ConvolutionalNetworks.ipynb ===========""")
     print("\tYou will need to compile a Cython extension for a portion of this assignment.")

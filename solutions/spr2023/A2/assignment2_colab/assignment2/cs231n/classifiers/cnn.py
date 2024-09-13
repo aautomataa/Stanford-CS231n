@@ -63,7 +63,26 @@ class ThreeLayerConvNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        C, H, W = input_dim
+
+        W1 = np.random.normal(0.0, weight_scale, size=(num_filters, C, filter_size, filter_size))
+        b1 = np.zeros(num_filters)
+        self.params.update({'W1': W1, 'b1': b1})
+        pad = (filter_size - 1) // 2
+        pool_stride = 2
+        pool_height = 2
+        pool_width = 2
+        H_out_conv = 1 + (H + 2 * pad - filter_size)
+        W_out_conv = 1 + (W + 2 * pad - filter_size)
+        H_out_pool = 1 + (H_out_conv - pool_height) // pool_stride
+        W_out_pool = 1 + (W_out_conv - pool_width) // pool_stride
+        D = num_filters * H_out_pool * W_out_pool
+        W2 = np.random.normal(0.0, weight_scale, size=(D, hidden_dim))
+        b2 = np.zeros(hidden_dim)
+        self.params.update({'W2': W2, 'b2': b2})
+        W3 = np.random.normal(0.0, weight_scale, size=(hidden_dim, num_classes))
+        b3 = np.zeros(num_classes)
+        self.params.update({'W3': W3, 'b3': b3})
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -102,7 +121,9 @@ class ThreeLayerConvNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        out_conv_relu_pool, cache_conv_relu_pool = conv_relu_pool_forward(X, W1, b1, conv_param, pool_param)
+        out_affine_relu, cache_affine_relu = affine_relu_forward(out_conv_relu_pool, W2, b2)
+        scores, cache_last_affine = affine_forward(out_affine_relu, W3, b3)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -125,7 +146,21 @@ class ThreeLayerConvNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        R_W = np.sum(W1*W1) + np.sum(W2*W2) + np.sum(W3*W3)
+        loss, sm_grad = softmax_loss(scores, y)
+        loss += 0.5*self.reg*R_W
+
+        dx_affine, dw3, db3 = affine_backward(sm_grad, cache_last_affine)
+        dw3 += W3 * self.reg
+        grads.update({'W3': dw3, 'b3': db3})
+
+        dx_affine_relu, dw2, db2 = affine_relu_backward(dx_affine, cache_affine_relu)
+        dw2 += W2 * self.reg
+        grads.update({'W2': dw2, 'b2': db2})
+
+        dx_conv_relu_pool, dw1, db1 = conv_relu_pool_backward(dx_affine_relu, cache_conv_relu_pool)
+        dw1 += W1 * self.reg
+        grads.update({'W1': dw1, 'b1': db1})
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
