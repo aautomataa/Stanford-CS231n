@@ -38,7 +38,10 @@ class PositionalEncoding(nn.Module):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        positions = torch.arange(max_len).unsqueeze(1)                                # (M, 1)
+        frequencies = torch.pow(10000, -torch.arange(0, embed_dim, 2) / embed_dim)    # (D/2, )
+        pe[...,0::2] = torch.sin(positions * frequencies)                             # (M, D/2)
+        pe[...,1::2] = torch.cos(positions * frequencies)                             # (M, D/2)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -70,7 +73,10 @@ class PositionalEncoding(nn.Module):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # self.pe:  (1, M, D)
+        # x:        (N, S, D)
+        output = x + self.pe[:,:S,:]
+        output = self.dropout(output)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -165,7 +171,34 @@ class MultiHeadAttention(nn.Module):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        query = self.query(query)   # (N, S, E)
+        key = self.key(key)         # (N, T, E)
+        value = self.value(value)   # (N, T, E)
+
+        query = query.view(N, S, self.n_head, self.head_dim)           # (N, S, H, E/H)
+        key = key.view(N, T, self.n_head, self.head_dim)               # (N, T, H, E/H)
+        value = value.view(N, T, self.n_head, self.head_dim)           # (N, T, H, E/H)
+
+        # query = query.permute(0, 2, 1, 3)                            # (N, H, S, E/H)
+        # key = key.permute(0, 2, 3, 1)                                # (N, H, E/H, T)
+        # weights = torch.matmul(query, key)                           # (N, H, S, T)
+        weights = torch.einsum('nshe,nthe->nhst', query, key)          # (N, H, S, T)
+
+        weights = weights / math.sqrt(self.head_dim)                   # (N, H, S, T)
+
+        if attn_mask is not None:
+            weights = weights.masked_fill(attn_mask == 0, float('-inf'))
+
+        weights = F.softmax(weights, dim=-1)                           # (N, H, S, T)
+        weights = self.attn_drop(weights)                              # (N, H, S, T)
+
+        # value = value.permute(0, 2, 1, 3)                            # (N, H, T, E/H)
+        # output = torch.matmul(weights, value)                        # (N, H, S, E/H
+        # output = output.permute(0, 2, 1, 3)                          # (N, S, H, E/H)
+        output = torch.einsum('nhst,nthe->nshe', weights, value)       # (N, S, H, E/H)
+
+        output = output.reshape(N, S, E)   # (N, S, E)
+        output = self.proj(output)   # (N, S, E)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
