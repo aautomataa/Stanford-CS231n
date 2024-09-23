@@ -16,7 +16,7 @@ Starter code containing Colab notebooks can be [downloaded here]({{site.hw_3_col
 - [Q3: Image Captioning with Transformers](#q3-image-captioning-with-transformers)
 - [Q4: Generative Adversarial Networks](#q4-generative-adversarial-networks)
 - [Q5: Self-Supervised Learning for Image Classification](#q5-self-supervised-learning-for-image-classification)
-- [Extra Credit: Image Captioning with LSTMs](#extra-credit-image-captioning-with-lstms-5-points)
+- [Extra Credit: Image Captioning with LSTMs](#extra-credit-image-Captioning-with-LSTMs)
 - [Submitting your work](#submitting-your-work)
 
 ### Setup
