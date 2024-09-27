@@ -13,7 +13,6 @@ Annual Slides: [CS231n slides](https://cs231n.stanford.edu/slides/)
 
 
 ## Assignments
-
 - [Assignment 1: Deep Learning Basics](assignments/spr2023/A1)
   - [Code](solutions/spr2023/A1/code)
     - [Q1: k-Nearest Neighbor classifier](solutions/spr2023/A1/code/assignment1/knn.ipynb)
