@@ -60,7 +60,7 @@ Annual Slides: [CS231n slides](https://cs231n.stanford.edu/slides/)
 
 
 ## Instruction
-本仓库主要包含 spr2024 版的课程 slides、spr2023 版的 3 个 assignments + solutions 等，其中大部分 solutions 是在本地 3050ti 的显卡上跑的，也有的是在 Google Colab 平台上跑的。
+本仓库主要包含 spr2024 版的课程 slides、spr2023 版的 3 个 assignments + solutions 等，其中大部分 solutions 是在本地 3050ti 的显卡上跑的，也有的是在 Google Colab TPU 上跑的。
 
 （ps1: CS231n 的 [课程在线笔记](https://cs231n.github.io/) 总结的很有意思也很细致，对课程学习很有帮助；也可参考 [智能单元专栏](https://zhuanlan.zhihu.com/p/22339097) ）
 
